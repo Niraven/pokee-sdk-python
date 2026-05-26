@@ -9,11 +9,13 @@ import httpx
 import pytest
 import respx
 
-from pokee_sdk import Pokee, AsyncPokee, Task, TaskStatus
+from pokee_sdk import AsyncPokee, Pokee, Task, TaskStatus
 from pokee_sdk.exceptions import (
+    APIError,
     AuthenticationError,
     NotFoundError,
     RateLimitError,
+    ValidationError,
 )
 
 
@@ -163,6 +165,24 @@ class TestErrorHandling:
         with pytest.raises(RateLimitError) as exc_info:
             client.tasks.get("x")
         assert exc_info.value.retry_after == 5.0
+
+    @respx.mock
+    def test_validation_error_with_plain_text_body(self, client: Pokee) -> None:
+        respx.get("https://api.pokee.ai/v1/tasks/invalid").mock(
+            return_value=httpx.Response(422, text="invalid task id")
+        )
+
+        with pytest.raises(ValidationError, match="invalid task id"):
+            client.tasks.get("invalid")
+
+    @respx.mock
+    def test_api_error_with_plain_text_body(self, client: Pokee) -> None:
+        respx.get("https://api.pokee.ai/v1/tasks/x").mock(
+            return_value=httpx.Response(500, text="upstream unavailable")
+        )
+
+        with pytest.raises(APIError, match="upstream unavailable"):
+            client.tasks.get("x")
 
 
 @pytest.mark.asyncio

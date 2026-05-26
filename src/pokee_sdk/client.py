@@ -19,6 +19,21 @@ from pokee_sdk.exceptions import (
 from pokee_sdk.models import Skill, SkillList, Task, TaskList, TaskStatus
 
 
+def _error_message(response: httpx.Response, default: str) -> str:
+    """Extract an API error message without assuming the body is JSON."""
+    try:
+        data = response.json()
+    except ValueError:
+        return response.text or default
+
+    if isinstance(data, dict):
+        message = data.get("message")
+        if isinstance(message, str) and message:
+            return message
+
+    return response.text or default
+
+
 class Pokee:
     """Synchronous client for the Pokee AI API.
 
@@ -109,9 +124,8 @@ class Pokee:
                 "Resource not found", status_code=404, request_id=request_id
             )
         if response.status_code == 422:
-            data = response.json()
             raise ValidationError(
-                data.get("message", "Validation failed"),
+                _error_message(response, "Validation failed"),
                 status_code=422,
                 request_id=request_id,
             )
@@ -123,11 +137,7 @@ class Pokee:
                 request_id=request_id,
             )
         if response.status_code >= 400:
-            try:
-                data = response.json()
-                msg = data.get("message", response.text)
-            except Exception:
-                msg = response.text
+            msg = _error_message(response, response.reason_phrase)
             raise APIError(msg, status_code=response.status_code, request_id=request_id)
 
         return response.json()
@@ -235,9 +245,8 @@ class AsyncPokee:
                 "Resource not found", status_code=404, request_id=request_id
             )
         if response.status_code == 422:
-            data = response.json()
             raise ValidationError(
-                data.get("message", "Validation failed"),
+                _error_message(response, "Validation failed"),
                 status_code=422,
                 request_id=request_id,
             )
@@ -249,11 +258,7 @@ class AsyncPokee:
                 request_id=request_id,
             )
         if response.status_code >= 400:
-            try:
-                data = response.json()
-                msg = data.get("message", response.text)
-            except Exception:
-                msg = response.text
+            msg = _error_message(response, response.reason_phrase)
             raise APIError(msg, status_code=response.status_code, request_id=request_id)
 
         return response.json()
