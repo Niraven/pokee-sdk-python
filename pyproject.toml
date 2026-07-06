@@ -5,16 +5,16 @@ build-backend = "hatchling.build"
 [project]
 name = "pokee-sdk"
 version = "0.1.0"
-description = "The official Python SDK for the Pokee AI platform"
+description = "Unofficial experimental Python client patterns for a Pokee-style task API"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.8"
 authors = [
-    { name = "Pokee AI", email = "sdk@pokee.ai" },
+    { name = "Nino Amor" },
 ]
 keywords = ["pokee", "ai", "sdk", "automation", "api"]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
@@ -42,8 +42,7 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://pokee.ai"
-Documentation = "https://docs.pokee.ai/sdk/python"
+Homepage = "https://github.com/Niraven/pokee-sdk-python"
 Repository = "https://github.com/Niraven/pokee-sdk-python"
 Issues = "https://github.com/Niraven/pokee-sdk-python/issues"
 Changelog = "https://github.com/Niraven/pokee-sdk-python/blob/main/CHANGELOG.md"
